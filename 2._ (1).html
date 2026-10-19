@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ratchanon Suksanong | IT Intern 2569</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1020; --surface:#111a2e; --surface2:#16213a;
+  --main:#3b82f6; --accent:#22d3ee;
+  --text:#e6ebf5; --muted:#8b97b3; --line:rgba(255,255,255,.08);
+}
+body.hacker{--main:#22c55e;--accent:#4ade80;--bg:#050a06;--surface:#0b140d;--surface2:#0f1c12}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Kanit',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;transition:background .4s}
+.mono{font-family:'JetBrains Mono',monospace}
+a{color:inherit;text-decoration:none}
+
+/* Loader */
+#loader{position:fixed;inset:0;background:#000;z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .6s}
+#loader pre{color:var(--accent);font-family:'JetBrains Mono';font-size:14px;line-height:1.7;max-width:90vw;white-space:pre-wrap}
+#loader.hide{opacity:0;pointer-events:none}
+
+/* Background */
+#matrix{position:fixed;inset:0;z-index:-2;opacity:.08}
+.cursor-glow{position:fixed;width:420px;height:420px;border-radius:50%;pointer-events:none;z-index:-1;
+  background:radial-gradient(circle,rgba(59,130,246,.15),transparent 65%);transform:translate(-50%,-50%)}
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--main);z-index:1000;width:0}
+
+/* Nav */
+nav{position:fixed;top:0;width:100%;display:flex;justify-content:space-between;align-items:center;padding:18px 6%;z-index:999;
+  backdrop-filter:blur(12px);background:rgba(11,16,32,.7);border-bottom:1px solid var(--line)}
+.logo{font-family:'JetBrains Mono';font-weight:700;font-size:1.25rem}
+.logo span{color:var(--accent)}
+nav ul{display:flex;gap:28px;list-style:none}
+nav ul a{position:relative;color:var(--muted);transition:.3s}
+nav ul a:hover{color:var(--text)}
+nav ul a::after{content:'';position:absolute;left:0;bottom:-4px;width:0;height:2px;background:var(--accent);transition:.3s}
+nav ul a:hover::after{width:100%}
+.burger{display:none;font-size:1.6rem;cursor:pointer}
+
+section{padding:110px 8% 80px}
+.sec-title{font-size:2.2rem;font-weight:800;margin-bottom:40px}
+.sec-title .mono{color:var(--accent);font-size:.95rem;display:block;font-weight:400;margin-bottom:4px}
+
+/* Hero */
+#home{min-height:100vh;display:flex;align-items:center;gap:70px;flex-wrap:wrap-reverse;justify-content:center}
+.hero-text{flex:1;min-width:300px;max-width:620px}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border:1px solid var(--line);border-radius:50px;color:var(--muted);font-size:.85rem;margin-bottom:20px;background:var(--surface)}
+.badge i{width:8px;height:8px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px #4ade80}
+.glitch{font-size:clamp(2.4rem,6vw,4.4rem);font-weight:800;position:relative;line-height:1.2;cursor:default}
+.glitch .last{color:var(--main)}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;left:0;top:0;width:100%;overflow:hidden;opacity:0}
+.glitch:hover::before{opacity:1;color:var(--accent);left:2px;animation:g1 .6s infinite linear alternate-reverse}
+.glitch:hover::after{opacity:1;color:var(--main);left:-2px;animation:g2 .8s infinite linear alternate-reverse}
+@keyframes g1{0%{clip-path:inset(0 0 85% 0)}50%{clip-path:inset(40% 0 40% 0)}100%{clip-path:inset(80% 0 5% 0)}}
+@keyframes g2{0%{clip-path:inset(70% 0 10% 0)}50%{clip-path:inset(5% 0 80% 0)}100%{clip-path:inset(45% 0 35% 0)}}
+.typing{font-family:'JetBrains Mono';font-size:1.15rem;margin:16px 0;color:var(--accent);min-height:1.6em}
+.typing::after{content:'_';animation:blink .8s infinite}
+@keyframes blink{50%{opacity:0}}
+.shop{color:var(--muted);margin-bottom:30px;line-height:1.7}
+.shop b{color:var(--text);letter-spacing:1px}
+.btns{display:flex;gap:14px;flex-wrap:wrap}
+.btn{padding:12px 28px;border-radius:10px;font-weight:600;cursor:pointer;font-family:inherit;font-size:1rem;transition:.3s;border:1px solid transparent}
+.btn-main{background:var(--main);color:#fff}
+.btn-main:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(59,130,246,.35)}
+.btn-ghost{background:transparent;color:var(--text);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+.avatar-wrap{position:relative;width:300px;height:300px;cursor:pointer}
+.ring{position:absolute;inset:-14px;border-radius:50%;border:2px dashed rgba(34,211,238,.45);animation:spin 20s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.avatar-box{position:relative;width:100%;height:100%;border-radius:50%;overflow:hidden;border:4px solid var(--main);box-shadow:0 0 45px rgba(59,130,246,.3);background:var(--surface)}
+.avatar-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 22%;transition:opacity .4s}
+.avatar-box .smile{opacity:0}
+.avatar-wrap:hover .smile,.avatar-wrap.smiling .smile{opacity:1}
+.float-tag{position:absolute;padding:8px 14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;font-family:'JetBrains Mono';font-size:.8rem;animation:float 4s ease-in-out infinite}
+.t1{top:14px;left:-70px}.t2{bottom:24px;right:-60px;animation-delay:2s}
+@keyframes float{50%{transform:translateY(-10px)}}
+
+/* About */
+.about-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:28px}
+.terminal{background:var(--surface);border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.term-bar{background:var(--surface2);padding:10px 14px;display:flex;gap:8px;align-items:center}
+.dot{width:11px;height:11px;border-radius:50%;background:#3a4560}
+.term-body{padding:22px;font-family:'JetBrains Mono';font-size:.92rem;line-height:1.9}
+.c-g{color:#4ade80}.c-k{color:var(--main)}.c-s{color:#a5d8ff}.c-a{color:var(--accent)}.c-m{color:var(--muted)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.stat{background:var(--surface);border-radius:14px;padding:24px;text-align:center;border:1px solid var(--line);transition:.3s}
+.stat:hover{border-color:var(--main);transform:translateY(-5px)}
+.stat h3{font-size:2.3rem;font-family:'JetBrains Mono'}
+.stat p{color:var(--muted)}
+
+/* Hobby */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}
+.card{background:var(--surface);border-radius:18px;padding:34px;border:1px solid var(--line);transition:transform .1s,border-color .3s;cursor:pointer}
+.card:hover{border-color:var(--main)}
+.card .icon{font-size:3rem;margin-bottom:14px}
+.card h3{font-size:1.4rem;margin-bottom:8px}
+.card p{color:var(--muted)}
+.tags{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+.tag{font-size:.78rem;padding:4px 12px;border-radius:50px;background:rgba(59,130,246,.12);color:var(--accent)}
+
+/* Timeline */
+.timeline{position:relative;max-width:800px;margin:auto}
+.timeline::before{content:'';position:absolute;left:20px;top:0;bottom:0;width:2px;background:var(--line)}
+.tl-item{position:relative;padding:0 0 36px 64px}
+.tl-item::before{content:'';position:absolute;left:12px;top:8px;width:18px;height:18px;border-radius:50%;background:var(--bg);border:3px solid var(--main)}
+.tl-box{background:var(--surface);padding:22px 24px;border-radius:14px;border:1px solid var(--line)}
+.tl-box .yr{font-family:'JetBrains Mono';color:var(--accent);font-size:.85rem}
+.tl-box h3{margin:6px 0}
+.tl-box p{color:var(--muted)}
+
+/* Gallery */
+.g-sub{color:var(--muted);margin:-28px 0 34px}
+.gallery{columns:4 240px;column-gap:16px}
+.gallery.collapsed .extra{display:none}
+.g-item{break-inside:avoid;margin-bottom:16px;border-radius:14px;overflow:hidden;position:relative;cursor:zoom-in;
+  border:1px solid var(--line);background:var(--surface);opacity:0;transform:translateY(30px);transition:opacity .6s,transform .6s,border-color .3s}
+.g-item.show{opacity:1;transform:none}
+.g-item:hover{border-color:var(--main)}
+.g-item img{width:100%;display:block;transition:transform .5s}
+.g-item:hover img{transform:scale(1.07)}
+.g-num{position:absolute;top:10px;left:10px;z-index:2;font-family:'JetBrains Mono';font-size:.75rem;background:rgba(0,0,0,.6);padding:3px 9px;border-radius:6px;color:var(--accent)}
+.g-cap{position:absolute;left:0;right:0;bottom:0;padding:34px 14px 12px;background:linear-gradient(transparent,rgba(0,0,0,.85));font-size:.9rem;transform:translateY(100%);transition:.35s}
+.g-item:hover .g-cap{transform:none}
+.g-more{text-align:center;margin-top:30px}
+
+/* Lightbox */
+#lightbox{position:fixed;inset:0;background:rgba(5,8,18,.95);z-index:5000;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.3s}
+#lightbox.open{opacity:1;pointer-events:auto}
+#lbImg{max-width:88vw;max-height:76vh;border-radius:12px;box-shadow:0 0 60px rgba(59,130,246,.25)}
+#lbCount{font-family:'JetBrains Mono';color:var(--accent);font-size:.85rem;margin-top:16px}
+#lbCap{margin-top:6px;text-align:center;padding:0 20px}
+.lb-btn{position:absolute;background:var(--surface);border:1px solid var(--line);color:var(--text);width:50px;height:50px;border-radius:50%;font-size:1.3rem;cursor:pointer;transition:.3s}
+.lb-btn:hover{border-color:var(--accent);color:var(--accent)}
+.lb-prev{left:3%;top:50%;transform:translateY(-50%)}
+.lb-next{right:3%;top:50%;transform:translateY(-50%)}
+.lb-close{top:20px;right:3%}
+
+/* Thanks */
+.editor{max-width:900px;margin:auto}
+.editor .term-body{font-size:.98rem;line-height:2}
+.ln{display:inline-block;width:32px;color:#3a4560;user-select:none}
+.thanks-btn{margin-top:30px;text-align:center}
+
+/* Contact */
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:900px;margin:auto}
+.contact-card{background:var(--surface);padding:26px;border-radius:14px;display:flex;align-items:center;gap:18px;cursor:pointer;border:1px solid var(--line);transition:.3s}
+.contact-card:hover{border-color:var(--main);transform:translateY(-4px)}
+.contact-card .ic{font-size:1.8rem}
+.contact-card small{color:var(--muted)}
+#toast{position:fixed;bottom:30px;left:50%;transform:translate(-50%,120px);background:var(--main);color:#fff;padding:12px 26px;border-radius:50px;font-weight:600;transition:.4s;z-index:6000}
+#toast.show{transform:translate(-50%,0)}
+
+footer{text-align:center;padding:40px;color:var(--muted);border-top:1px solid var(--line)}
+footer .mono{color:var(--text)}
+
+.reveal{opacity:0;transform:translateY(40px);transition:.9s cubic-bezier(.2,.8,.2,1)}
+.reveal.active{opacity:1;transform:none}
+.confetti{position:fixed;top:-20px;font-size:1.5rem;pointer-events:none;z-index:3000;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+/* Music button */
+#musicBtn{position:fixed;left:20px;bottom:20px;width:46px;height:46px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--line);color:var(--accent);
+  font-size:1.2rem;cursor:pointer;z-index:1001;transition:.3s}
+#musicBtn:hover{border-color:var(--accent);transform:scale(1.08)}
+#musicBtn.playing{box-shadow:0 0 18px rgba(34,211,238,.45);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 6px rgba(34,211,238,.2)}}
+
+@media(max-width:800px){
+  nav ul{position:fixed;top:64px;right:-100%;flex-direction:column;background:var(--surface);padding:30px;width:70%;height:100vh;transition:.4s}
+  nav ul.open{right:0}
+  .burger{display:block}
+  .about-grid{grid-template-columns:1fr}
+  .avatar-wrap{width:230px;height:230px}
+  .t1{left:-20px}.t2{right:-20px}
+  .cursor-glow{display:none}
+  .gallery{columns:2 140px;column-gap:10px}
+  .g-item{margin-bottom:10px}
+  .g-cap{transform:none;font-size:.75rem;padding:24px 10px 8px}
+  .lb-prev,.lb-next{top:auto;bottom:30px;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div id="loader"><pre id="bootText"></pre></div>
+<canvas id="matrix"></canvas>
+<div class="cursor-glow" id="glow"></div>
+<div id="progress"></div>
+<div id="toast">คัดลอกแล้ว ✔</div>
+
+<!-- Background music (เปลี่ยนชื่อไฟล์ที่ src ได้) -->
+<audio id="bgm" src="music.mp3" loop preload="auto"></audio>
+<button id="musicBtn" title="เปิด/ปิดเพลง">🔇</button>
+
+<nav>
+  <div class="logo">&lt;Poom ITSupport<span>/&gt;</span></div>
+  <ul id="menu">
+    <li><a href="#home">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#hobby">Hobby</a></li>
+    <li><a href="#edu">Education</a></li>
+    <li><a href="#works">Works</a></li>
+    <li><a href="#thanks">Thanks</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="burger" id="burger">☰</div>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-text reveal">
+    <span class="badge mono"><i></i>นักศึกษาฝึกงาน ปี 2569</span>
+    <h1 class="glitch" data-text="รัชชานนท์ สุขสนอง">รัชชานนท์ <span class="last">สุขสนอง</span></h1>
+    <div class="typing" id="typing"></div>
+    <p class="shop">ซื้อ-ขาย / ซ่อม / ประกอบคอมพิวเตอร์<br><b>POOM COMPUTER SHOP</b> 🖱️</p>
+    <div class="btns">
+      <a href="#about" class="btn btn-main">รู้จักผมให้มากขึ้น</a>
+      <a href="#works" class="btn btn-ghost">ดูผลงาน 📸</a>
+    </div>
+  </div>
+  <div class="avatar-wrap reveal" id="avatar">
+    <div class="ring"></div>
+    <div class="avatar-box">
+      <img src="poom.jpg" alt="Ratchanon">
+      <!-- ถ้ามีรูปยิ้ม ตั้งชื่อ profile-smile.jpg ไว้โฟลเดอร์เดียวกัน ถ้าไม่มี รูปนี้จะถูกซ่อนเอง -->
+      <img src="profile-smile.jpg" alt="" class="smile" onerror="this.remove()">
+    </div>
+    <div class="float-tag t1">💻 PC Builder</div>
+    <div class="float-tag t2">🏸 Badminton</div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <h2 class="sec-title reveal"><span class="mono">// 01. whoami</span>เกี่ยวกับผม</h2>
+  <div class="about-grid">
+    <div class="terminal reveal">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="mono c-m" style="margin-left:10px;font-size:.8rem">poom@it-intern:~</span></div>
+      <div class="term-body">
+        <span class="c-g">poom@intern</span>:<span class="c-k">~</span>$ cat profile.json<br>
+        {<br>
+        &nbsp;&nbsp;<span class="c-a">"name"</span>: <span class="c-s">"รัชชานนท์ สุขสนอง"</span>,<br>
+        &nbsp;&nbsp;<span class="c-a">"nickname"</span>: <span class="c-s">"ภูมิ"</span>,<br>
+        &nbsp;&nbsp;<span class="c-a">"birthday"</span>: <span class="c-s">"พุธ 20 เม.ย. 2548"</span>,<br>
+        &nbsp;&nbsp;<span class="c-a">"major"</span>: <span class="c-s">"เทคโนโลยีคอมพิวเตอร์"</span>,<br>
+        &nbsp;&nbsp;<span class="c-a">"from"</span>: <span class="c-s">"หนองแค, สระบุรี"</span>,<br>
+        &nbsp;&nbsp;<span class="c-a">"status"</span>: <span class="c-g">"ฝึกงานจบแล้ว ✔"</span><br>
+        }<br>
+        <span class="c-g">poom@intern</span>:<span class="c-k">~</span>$ <span class="c-m">_</span>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat reveal"><h3 class="counter" data-target="21">0</h3><p>อายุ (ปี)</p></div>
+      <div class="stat reveal"><h3 class="counter" data-target="175">0</h3><p>ส่วนสูง (ซม.)</p></div>
+      <div class="stat reveal"><h3 class="counter" data-target="70">0</h3><p>น้ำหนัก (กก.)</p></div>
+      <div class="stat reveal"><h3 class="counter" data-target="100">0</h3><p>% ความตั้งใจ</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOBBY -->
+<section id="hobby">
+  <h2 class="sec-title reveal"><span class="mono">// 02. hobbies.exe</span>งานอดิเรก</h2>
+  <div class="cards">
+    <div class="card tilt reveal">
+      <div class="icon">🏸</div>
+      <h3>แบดมินตัน</h3>
+      <p>ตีแบดคลายเครียด ได้ออกกำลังกาย ฝึกสมาธิ และได้เพื่อนใหม่ด้วย</p>
+      <div class="tags"><span class="tag">#Sport</span><span class="tag">#Teamwork</span></div>
+    </div>
+    <div class="card tilt reveal">
+      <div class="icon">🛠️</div>
+      <h3>ซ่อม / ประกอบคอม</h3>
+      <p>ชอบประกอบเครื่อง จัดสเปก แก้ปัญหาฮาร์ดแวร์ จนกลายเป็นร้าน POOM COMPUTER SHOP</p>
+      <div class="tags"><span class="tag">#Hardware</span><span class="tag">#PCBuild</span><span class="tag">#Troubleshoot</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="edu">
+  <h2 class="sec-title reveal"><span class="mono">// 03. git log --education</span>การศึกษา</h2>
+  <div class="timeline">
+    <div class="tl-item reveal">
+      <div class="tl-box">
+        <span class="yr">พ.ศ. 2566 – 2570</span>
+        <h3>🎓 ปริญญาตรี</h3>
+        <p>สาขาเทคโนโลยีคอมพิวเตอร์<br>มหาวิทยาลัยเทคโนโลยีราชมงคลธัญบุรี</p>
+      </div>
+    </div>
+    <div class="tl-item reveal">
+      <div class="tl-box">
+        <span class="yr">พ.ศ. 2563 – 2566</span>
+        <h3>🏫 มัธยมศึกษาตอนปลาย</h3>
+        <p>สายศิลป์ - ภาษา<br>โรงเรียนเสาไห้ (วิมลวิทยานุกูล)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKS / GALLERY -->
+<section id="works">
+  <h2 class="sec-title reveal"><span class="mono">// 04. ls ./internship-works</span>ผลงานระหว่างฝึกงาน</h2>
+  <p class="g-sub reveal">คลิกที่รูปเพื่อดูแบบเต็มจอ 📸</p>
+  <div class="gallery collapsed" id="gallery"></div>
+  <div class="g-more"><button class="btn btn-ghost" id="moreBtn">ดูทั้งหมด ↓</button></div>
+</section>
+
+<div id="lightbox">
+  <button class="lb-btn lb-close" id="lbClose">✕</button>
+  <button class="lb-btn lb-prev" id="lbPrev">‹</button>
+  <img id="lbImg" alt="">
+  <div id="lbCount"></div>
+  <div id="lbCap"></div>
+  <button class="lb-btn lb-next" id="lbNext">›</button>
+</div>
+
+<!-- THANKS -->
+<section id="thanks">
+  <h2 class="sec-title reveal"><span class="mono">// 05. thank_you.js</span>ประสบการณ์ฝึกงาน</h2>
+  <div class="terminal editor reveal">
+    <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="mono c-m" style="margin-left:10px;font-size:.8rem">thank_you.js</span></div>
+    <div class="term-body">
+      <span class="ln">1</span><span class="c-m">// ข้อความถึงพี่ๆ DIM และพี่ๆ IT ทุกคน</span><br>
+      <span class="ln">2</span><span class="c-k">const</span> <span class="c-a">message</span> = <span class="c-s">`</span><br>
+      <span class="ln">3</span>&nbsp;&nbsp;ขอบคุณพี่ๆ DIM และพี่ๆ IT ทุกคนมากครับ ที่คอยสอนงาน ให้คำแนะนำ<br>
+      <span class="ln">4</span>&nbsp;&nbsp;และดูแลผมเป็นอย่างดีตลอดการฝึกงาน พี่ๆ ทุกคนเป็นกันเองมาก<br>
+      <span class="ln">5</span>&nbsp;&nbsp;ทำให้ผมกล้าถาม กล้าแสดงความคิดเห็น และได้เรียนรู้จากการทำงานจริง<br>
+      <span class="ln">6</span><br>
+      <span class="ln">7</span>&nbsp;&nbsp;การฝึกงานครั้งนี้เป็นประสบการณ์ที่ดีมากครับ ได้ทั้งความรู้<br>
+      <span class="ln">8</span>&nbsp;&nbsp;ทักษะการทำงาน และมิตรภาพดีๆ ที่น่าประทับใจ<br>
+      <span class="ln">9</span>&nbsp;&nbsp;ขอบคุณที่ทำให้ช่วงเวลาฝึกงานเต็มไปด้วยความรู้และความทรงจำดีๆ<br>
+      <span class="ln">10</span>&nbsp;&nbsp;จะคิดถึงพี่ๆ ทุกคนนะครับ ไว้เจอกันใหม่ครับ 🙏<br>
+      <span class="ln">11</span><span class="c-s">`</span>;<br>
+      <span class="ln">12</span><br>
+      <span class="ln">13</span><span class="c-a">console</span>.<span class="c-k">log</span>(message); <span class="c-m">// Forever grateful 💙</span>
+    </div>
+  </div>
+  <div class="thanks-btn reveal"><button class="btn btn-main" id="celebrate">🎉 กดเพื่อส่งความขอบคุณ</button></div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <h2 class="sec-title reveal" style="text-align:center"><span class="mono">// 06. ping me</span>ติดต่อผม</h2>
+  <div class="contact-grid">
+    <!-- ใส่เบอร์จริงทั้ง 2 จุด: data-copy และในแท็ก h3 -->
+    <div class="contact-card reveal" data-copy="0861377833">
+      <span class="ic">📞</span><div><h3 class="mono">0861377833</h3><small>คลิกเพื่อคัดลอก</small></div>
+    </div>
+    <!-- ใส่อีเมลจริงทั้ง 2 จุด -->
+    <div class="contact-card reveal" data-copy="poommmzaaaa12345@gmail.com">
+      <span class="ic">✉️</span><div><h3 class="mono" style="font-size:.92rem">poommmzaaaa12345@gmail.com</h3><small>คลิกเพื่อคัดลอก</small></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p class="mono">&lt;/&gt; Made with ☕ by Poom — 2569</p>
+  <p style="font-size:.8rem;margin-top:8px">psst... ลองกด ↑ ↑ ↓ ↓ ← → ← → B A ดูสิ 👀</p>
+</footer>
+
+<script>
+/* Boot loader */
+const bootLines=["> Initializing POOM-OS v25.69 ...","> Loading drivers .......... [OK]","> Mounting /intern/experience  [OK]","> Connecting to DIM & IT team  [OK]","> Starting portfolio.exe ...","> Welcome 👋"];
+const bootEl=document.getElementById('bootText');let bi=0;
+const bootTimer=setInterval(()=>{
+  bootEl.textContent+=bootLines[bi]+"\n";bi++;
+  if(bi===bootLines.length){clearInterval(bootTimer);setTimeout(()=>document.getElementById('loader').classList.add('hide'),500);}
+},300);
+
+/* Matrix rain */
+const cv=document.getElementById('matrix'),ctx=cv.getContext('2d');
+let drops;const chars="01<>/{}#$POOM";
+function resize(){cv.width=innerWidth;cv.height=innerHeight;drops=Array(Math.floor(cv.width/18)).fill(1);}
+resize();addEventListener('resize',resize);
+setInterval(()=>{
+  const s=getComputedStyle(document.body);
+  ctx.fillStyle=s.getPropertyValue('--bg').trim()+"22";ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.fillStyle=s.getPropertyValue('--main');ctx.font="14px JetBrains Mono";
+  drops.forEach((y,i)=>{ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*18,y*18);
+    if(y*18>cv.height&&Math.random()>.975)drops[i]=0;drops[i]++;});
+},60);
+
+/* Typing */
+const roles=["IT Intern @ 2569","IT Support","PC Builder","Computer Technician","Badminton Lover"];
+let ri=0,ci=0,del=false;const tEl=document.getElementById('typing');
+(function type(){
+  const w=roles[ri];tEl.textContent="> "+w.slice(0,ci);
+  if(!del&&ci<w.length)ci++;else if(del&&ci>0)ci--;
+  else{del=!del;if(!del)ri=(ri+1)%roles.length;setTimeout(type,del?1400:300);return;}
+  setTimeout(type,del?40:90);
+})();
+
+/* Cursor glow + progress */
+const glow=document.getElementById('glow');
+addEventListener('mousemove',e=>{glow.style.left=e.clientX+'px';glow.style.top=e.clientY+'px';});
+addEventListener('scroll',()=>{const h=document.documentElement;
+  document.getElementById('progress').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight))*100+'%';});
+
+/* Avatar: แตะบนมือถือเพื่อสลับรูปยิ้ม */
+document.getElementById('avatar').addEventListener('click',function(){this.classList.toggle('smiling');});
+
+/* Reveal + counters */
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;e.target.classList.add('active');
+  e.target.querySelectorAll('.counter').forEach(runCounter);
+  io.unobserve(e.target);
+}),{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+function runCounter(el){if(el.dataset.done)return;el.dataset.done=1;
+  const t=+el.dataset.target;let n=0;const step=Math.ceil(t/60);
+  const iv=setInterval(()=>{n+=step;if(n>=t){n=t;clearInterval(iv);}el.textContent=n;},25);}
+
+/* 3D tilt */
+document.querySelectorAll('.tilt').forEach(c=>{
+  c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect();
+    const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+    c.style.transform=`perspective(800px) rotateY(${x*12}deg) rotateX(${-y*12}deg) scale(1.02)`;});
+  c.addEventListener('mouseleave',()=>c.style.transform='');
+});
+
+/* Toast + copy contact */
+const toast=document.getElementById('toast');
+function showToast(msg){toast.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1800);}
+document.querySelectorAll('[data-copy]').forEach(c=>c.addEventListener('click',()=>{
+  navigator.clipboard.writeText(c.dataset.copy);showToast("คัดลอกแล้ว ✔");}));
+
+/* Confetti */
+function confetti(n=50){const em=["🎉","💙","💻","🙏","✨"];
+  for(let i=0;i<n;i++){const s=document.createElement('span');s.className='confetti';
+    s.textContent=em[Math.floor(Math.random()*em.length)];s.style.left=Math.random()*100+'vw';
+    s.style.animationDuration=2+Math.random()*3+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),5000);}}
+document.getElementById('celebrate').onclick=()=>confetti();
+
+/* ================= GALLERY ================= */
+const TOTAL = 22;                 // จำนวนรูปทั้งหมด
+const SHOW_FIRST = 8;             // โชว์กี่รูปก่อนกด "ดูทั้งหมด"
+const FOLDER = 'works/';          // ถ้าวางรูปไว้ข้าง index.html เลย ให้แก้เป็น ''
+const EXTS = ['jpg','jpeg','png','webp','JPG','JPEG','PNG'];   // ลองหานามสกุลให้อัตโนมัติ
+
+// คำอธิบายรูป (ไม่ใส่ก็ได้ จะขึ้นว่า "ผลงานชิ้นที่ X")
+const captions = {
+  // 1: "ติดตั้งคอมพิวเตอร์ให้พนักงาน",
+  // 2: "เดินสาย LAN",
+};
+
+const gal = document.getElementById('gallery');
+const moreBtn = document.getElementById('moreBtn');
+const gio = new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add('show');gio.unobserve(e.target);}
+}),{threshold:.1});
+
+function updateMoreBtn(){
+  const count = gal.querySelectorAll('.g-item').length;
+  const collapsed = gal.classList.contains('collapsed');
+  moreBtn.parentElement.style.display = count > SHOW_FIRST ? '' : 'none';
+  moreBtn.textContent = collapsed ? `ดูทั้งหมด ${count} รูป ↓` : 'ย่อกลับ ↑';
+}
+function relabelExtra(){
+  gal.querySelectorAll('.g-item').forEach((el,idx)=>el.classList.toggle('extra', idx >= SHOW_FIRST));
+}
+
+for(let i=1;i<=TOTAL;i++){
+  const cap = captions[i] || `ผลงานชิ้นที่ ${i}`;
+  const d = document.createElement('div');
+  d.className = 'g-item' + (i > SHOW_FIRST ? ' extra' : '');
+  d.innerHTML = `<span class="g-num">#${String(i).padStart(2,'0')}</span>
+    <img alt="${cap}" loading="lazy">
+    <div class="g-cap">${cap}</div>`;
+  const img = d.querySelector('img');
+  let e = 0;
+  img.onerror = () => {               // ลองนามสกุลถัดไป ถ้าหมดแล้วให้ซ่อนรูปนั้น
+    e++;
+    if(e < EXTS.length) img.src = FOLDER + i + '.' + EXTS[e];
+    else { d.remove(); relabelExtra(); updateMoreBtn(); }
+  };
+  img.src = FOLDER + i + '.' + EXTS[0];
+  gal.appendChild(d);
+  gio.observe(d);
+}
+updateMoreBtn();
+
+moreBtn.onclick = () => {
+  const collapsed = gal.classList.toggle('collapsed');
+  updateMoreBtn();
+  if(collapsed) document.getElementById('works').scrollIntoView();
+};
+
+/* Lightbox */
+const lb=document.getElementById('lightbox'), lbImg=document.getElementById('lbImg');
+const lbCap=document.getElementById('lbCap'), lbCount=document.getElementById('lbCount');
+let cur=0;
+const items=()=>[...gal.querySelectorAll('.g-item')];
+
+function openLb(i){
+  const it=items(); if(!it.length) return;
+  cur=(i+it.length)%it.length;
+  const el=it[cur];
+  lbImg.src=el.querySelector('img').src;
+  lbCap.textContent=el.querySelector('.g-cap').textContent;
+  lbCount.textContent=`${cur+1} / ${it.length}`;
+  lb.classList.add('open'); document.body.style.overflow='hidden';
+}
+function closeLb(){lb.classList.remove('open');document.body.style.overflow='';}
+
+gal.addEventListener('click',e=>{const it=e.target.closest('.g-item');if(it)openLb(items().indexOf(it));});
+document.getElementById('lbPrev').onclick=()=>openLb(cur-1);
+document.getElementById('lbNext').onclick=()=>openLb(cur+1);
+document.getElementById('lbClose').onclick=closeLb;
+lb.addEventListener('click',e=>{if(e.target===lb)closeLb();});
+
+let tx=0;
+lb.addEventListener('touchstart',e=>tx=e.touches[0].clientX,{passive:true});
+lb.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>50) openLb(dx<0?cur+1:cur-1);
+});
+
+/* Keyboard: Lightbox + Konami (Hacker mode) */
+const code=["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];let kp=0;
+addEventListener('keydown',e=>{
+  if(lb.classList.contains('open')){
+    if(e.key==='ArrowLeft')openLb(cur-1);
+    if(e.key==='ArrowRight')openLb(cur+1);
+    if(e.key==='Escape')closeLb();
+    return;
+  }
+  kp=(e.key===code[kp])?kp+1:(e.key===code[0]?1:0);
+  if(kp===code.length){document.body.classList.toggle('hacker');showToast("🕶️ HACKER MODE");confetti(25);kp=0;}
+});
+
+/* Mobile menu */
+const menu=document.getElementById('menu');
+document.getElementById('burger').onclick=()=>menu.classList.toggle('open');
+menu.querySelectorAll('a').forEach(a=>a.onclick=()=>menu.classList.remove('open'));
+
+/* ===== Background Music ===== */
+const bgm = document.getElementById('bgm');
+const musicBtn = document.getElementById('musicBtn');
+const MUSIC_VOL = 0.25;          // ความดัง 0 - 1 (ปรับได้)
+let userPaused = false, fadeIv;
+
+function fadeTo(target, ms = 1500, done){
+  clearInterval(fadeIv);
+  const steps = 30, stepMs = ms / steps;
+  const delta = (target - bgm.volume) / steps;
+  fadeIv = setInterval(() => {
+    bgm.volume = Math.min(1, Math.max(0, bgm.volume + delta));
+    if (Math.abs(bgm.volume - target) < 0.01){
+      bgm.volume = target; clearInterval(fadeIv); done && done();
+    }
+  }, stepMs);
+}
+function playMusic(){
+  bgm.volume = 0;
+  bgm.play().then(() => {
+    musicBtn.textContent = '🔊';
+    musicBtn.classList.add('playing');
+    fadeTo(MUSIC_VOL);           // ค่อยๆ ดังขึ้น
+  }).catch(() => {});            // เบราว์เซอร์บล็อก → รอให้ผู้ใช้แตะก่อน
+}
+function pauseMusic(){
+  fadeTo(0, 600, () => bgm.pause());
+  musicBtn.textContent = '🔇';
+  musicBtn.classList.remove('playing');
+}
+
+musicBtn.addEventListener('click', () => {
+  if (bgm.paused){ userPaused = false; playMusic(); }
+  else { userPaused = true; pauseMusic(); }
+});
+
+// พยายามเล่นทันทีที่เข้าเว็บ
+playMusic();
+
+// ถ้าโดนบล็อก ให้เริ่มเล่นตอนผู้ใช้แตะ/คลิก/กดคีย์ครั้งแรก
+['pointerdown','keydown','touchstart'].forEach(ev =>
+  addEventListener(ev, function unlock(e){
+    if (e.target.closest && e.target.closest('#musicBtn')) return;
+    if (!userPaused && bgm.paused) playMusic();
+    if (!bgm.paused) ['pointerdown','keydown','touchstart'].forEach(x => removeEventListener(x, unlock));
+  }, {passive:true})
+);
+
+// หยุดเพลงเมื่อสลับแท็บ แล้วเล่นต่อเมื่อกลับมา
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) bgm.pause();
+  else if (!userPaused) playMusic();
+});
+</script>
+</body>
+</html>
